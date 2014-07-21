@@ -1,6 +1,8 @@
-# Phonegap-SMS
+# Cordova-SMS
 
-## PhoneGap plugin to send and receive sms
+## Cordova plugin to send and receive sms
+
+### Original work by Asanka-x https://github.com/asanka-x/Phonegap-SMS.git
 
 ### Supported Features
 
