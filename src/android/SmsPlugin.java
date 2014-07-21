@@ -60,7 +60,8 @@ public class SmsPlugin extends CordovaPlugin {
                 break;
             case GET_NUMBER:
                 try {
-                    TelephonyManager tmanager = this.cordova.getActivity().getSystemService(TelephonyManager.TELEPHONY_SERVICE);
+                    Activity act = this.cordova.getActivity();
+                    TelephonyManager tmanager = (TelephonyManager) act.getSystemService(CallbackContext.TELEPHONY_SERVICE);
                     String phoneNumber = tmanager.getLine1Number();
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, phoneNumber));
                     result = true;
@@ -72,7 +73,8 @@ public class SmsPlugin extends CordovaPlugin {
                 break;
             case GET_MNC:
                 try {
-                    TelephonyManager tmanager = this.cordova.getActivity().getSystemService(TelephonyManager.TELEPHONY_SERVICE);
+                    Activity acti = this.cordova.getActivity();
+                    TelephonyManager tmanager = (TelephonyManager) acti.getSystemService(CallbackContext.TELEPHONY_SERVICE);
                     String mnc = tmanager.getNetworkOperator();
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, mnc));
                     result = true;
