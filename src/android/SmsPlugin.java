@@ -62,7 +62,6 @@ public class SmsPlugin extends CordovaPlugin {
                 result=true;
                 break;
             case GET_NUMBER:
-                try {
                     telephonyManager = (TelephonyManager) this.cordova.getActivity().getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
                     // Check phone data
                     if (telephonyManager == null) {
@@ -85,22 +84,12 @@ public class SmsPlugin extends CordovaPlugin {
                     String phoneNumber = telephonyManager.getLine1Number();
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, phoneNumber));
                     result = true;
-                }
-                catch (JSONException exc){
-                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION));
-                }
-
                 break;
             case GET_MNC:
-                try {
                     telephonyManager = (TelephonyManager) this.cordova.getActivity().getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
                     String mccmnc = telephonyManager.getSimOperator();
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, mccmnc));
                     result = true;
-                }
-                catch (JSONException exce){
-                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION));
-                }
                 break;
             case RECEIVE_SMS:
                 // if already receiving (this case can happen if the startReception is called
