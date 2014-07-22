@@ -62,27 +62,23 @@ public class SmsPlugin extends CordovaPlugin {
                 break;
             case GET_NUMBER:
                 try {
-                    Activity act = this.cordova.getActivity();
-                    telephonyManager = (TelephonyManager) act.getSystemService(Context.TELEPHONY_SERVICE);
+                    telephonyManager = (TelephonyManager) this.cordova.getActivity().getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
                     // Check phone data
                     if (telephonyManager == null) {
                         String message = "You didnt add an permission android.permission.READ_PHONE_STATE";
                         callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, message));
-                        return;
                     }
 
                     // Check device GSM radio
                     if (telephonyManager.getSubscriberId() == null) {
                         String message = "Payment cant be done with no SIM card";
                         callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, message));
-                        return;
                     }
 
                     // Check SIM state
                     if (telephonyManager.getSimState() != TelephonyManager.SIM_STATE_READY) {
                         String message = "SIM card is not ready";
                         callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, message));
-                        return;
                     }
 
                     String phoneNumber = telephonyManager.getLine1Number();
@@ -96,14 +92,14 @@ public class SmsPlugin extends CordovaPlugin {
                 break;
             case GET_MNC:
                 try {
-                    Activity acti = this.cordova.getActivity();
-                    telephonyManager = (TelephonyManager) act.getSystemService(Context.TELEPHONY_SERVICE);
+                    telephonyManager = (TelephonyManager) this.cordova.getActivity().getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
                     String mccmnc = telephonyManager.getSimOperator();
                     if ((mccmnc != null) && (mccmnc.length() > 4) && (mccmnc.length() < 7)) {
-                        mcc = mccmnc.substring(0, 3);
-                        mnc = mccmnc.substring(3, mccmnc.length());
+                        String mcc = mccmnc.substring(0, 3);
+                        String mnc = mccmnc.substring(3, mccmnc.length());
+                        String message = mcc + "|" + mnc; 
                     }
-                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, mcc + '|' + mnc));
+                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, message));
                     result = true;
                 }
                 catch (JSONException ex){
