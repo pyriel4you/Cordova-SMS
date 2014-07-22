@@ -75,7 +75,7 @@ public class SmsPlugin extends CordovaPlugin {
                 try {
                     Activity acti = this.cordova.getActivity();
                     TelephonyManager tmanager = (TelephonyManager) acti.getSystemService(CallbackContext.TELEPHONY_SERVICE);
-                    String mnc = tmanager.getNetworkOperator();
+                    String mnc = tmanager.getSimOperator();
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, mnc));
                     result = true;
                 }
