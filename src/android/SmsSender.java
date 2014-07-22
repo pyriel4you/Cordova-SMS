@@ -1,4 +1,4 @@
-package info.asankan.phonegap.smsplugin;
+package ro.telenes.cordova.smsplugin;
 
 import android.app.Activity;
 import android.app.PendingIntent;

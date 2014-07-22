@@ -1,4 +1,4 @@
-package info.asankan.phonegap.smsplugin;
+package ro.telenes.cordova.smsplugin;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
