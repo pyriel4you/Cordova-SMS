@@ -95,12 +95,7 @@ public class SmsPlugin extends CordovaPlugin {
                 try {
                     telephonyManager = (TelephonyManager) this.cordova.getActivity().getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
                     String mccmnc = telephonyManager.getSimOperator();
-                    if ((mccmnc != null) && (mccmnc.length() > 4) && (mccmnc.length() < 7)) {
-                        String mcc = mccmnc.substring(0, 3);
-                        String mnc = mccmnc.substring(3, mccmnc.length());
-                        String message = mcc + "|" + mnc; 
-                    }
-                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, message));
+                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, mccmnc));
                     result = true;
                 }
                 catch (JSONException ex){
