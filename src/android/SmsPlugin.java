@@ -86,7 +86,7 @@ public class SmsPlugin extends CordovaPlugin {
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, phoneNumber));
                     result = true;
                 }
-                catch (JSONException ex){
+                catch (JSONException exc){
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION));
                 }
 
@@ -98,7 +98,7 @@ public class SmsPlugin extends CordovaPlugin {
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, mccmnc));
                     result = true;
                 }
-                catch (JSONException ex){
+                catch (JSONException exce){
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION));
                 }
                 break;
