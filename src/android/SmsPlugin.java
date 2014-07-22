@@ -19,6 +19,8 @@ public class SmsPlugin extends CordovaPlugin {
 
     private CallbackContext callback_receive;
 
+    private TelephonyManager telephonyManager;
+
     private boolean isReceiving = false;
     private boolean result=false;
 
@@ -61,8 +63,29 @@ public class SmsPlugin extends CordovaPlugin {
             case GET_NUMBER:
                 try {
                     Activity act = this.cordova.getActivity();
-                    TelephonyManager tmanager = (TelephonyManager) act.getSystemService(CallbackContext.TELEPHONY_SERVICE);
-                    String phoneNumber = tmanager.getLine1Number();
+                    telephonyManager = (TelephonyManager) act.getSystemService(Context.TELEPHONY_SERVICE);
+                    // Check phone data
+                    if (telephonyManager == null) {
+                        String message = "You didnt add an permission android.permission.READ_PHONE_STATE";
+                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, message));
+                        return;
+                    }
+
+                    // Check device GSM radio
+                    if (telephonyManager.getSubscriberId() == null) {
+                        String message = "Payment cant be done with no SIM card";
+                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, message));
+                        return;
+                    }
+
+                    // Check SIM state
+                    if (telephonyManager.getSimState() != TelephonyManager.SIM_STATE_READY) {
+                        String message = "SIM card is not ready";
+                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, message));
+                        return;
+                    }
+
+                    String phoneNumber = telephonyManager.getLine1Number();
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, phoneNumber));
                     result = true;
                 }
@@ -74,9 +97,13 @@ public class SmsPlugin extends CordovaPlugin {
             case GET_MNC:
                 try {
                     Activity acti = this.cordova.getActivity();
-                    TelephonyManager tmanager = (TelephonyManager) acti.getSystemService(CallbackContext.TELEPHONY_SERVICE);
-                    String mnc = tmanager.getSimOperator();
-                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, mnc));
+                    telephonyManager = (TelephonyManager) act.getSystemService(Context.TELEPHONY_SERVICE);
+                    String mccmnc = telephonyManager.getSimOperator();
+                    if ((mccmnc != null) && (mccmnc.length() > 4) && (mccmnc.length() < 7)) {
+                        mcc = mccmnc.substring(0, 3);
+                        mnc = mccmnc.substring(3, mccmnc.length());
+                    }
+                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, mcc + '|' + mnc));
                     result = true;
                 }
                 catch (JSONException ex){
