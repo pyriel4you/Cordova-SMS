@@ -168,7 +168,8 @@ public class SmsPlugin extends CordovaPlugin {
 		}
 		catch (JSONException ex) {
 		    this.callback_send.sendPluginResult(new PluginResult( PluginResult.Status.JSON_EXCEPTION));
-		}	
+		}
+		return true;
 	}
 	private boolean receiveSMS(){
 		// if already receiving (this case can happen if the startReception is called
