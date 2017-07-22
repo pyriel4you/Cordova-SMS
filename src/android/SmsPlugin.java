@@ -28,19 +28,21 @@ public class SmsPlugin extends CordovaPlugin {
     private static final int SEND_SMS_REQ_CODE = 0;
     private static final int RECEIVE_SMS_REQ_CODE = 0;
     private PluginResult pluginResult;
+    private JSONArray args;
 	
 	
 	@Override
 	public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
         action=action.toUpperCase();
-		
+	this.args = args;
         switch(ActionType.valueOf(action)){
             case SEND_SMS:
 		if (!hasSendPermission()) {
-			result = requestSendPermission();
+			requestSendPermission();
 		} else {
-			result = sendSMS();	
+			sendSMS();	
 		}
+			result = true;
                 break;
             case HAS_SMS_POSSIBILITY:
                 Activity ctx = this.cordova.getActivity();
@@ -83,10 +85,11 @@ public class SmsPlugin extends CordovaPlugin {
                 break;
             case RECEIVE_SMS:
                 if (!hasReceivePermission()) {
-			result = requestReceivePermission();
+			requestReceivePermission();
 		} else {
-			result = receiveSMS();	
+			receiveSMS();	
 		}
+			result = true;
                 break;
             case STOP_RECEIVE_SMS:
 
@@ -141,10 +144,10 @@ public class SmsPlugin extends CordovaPlugin {
 		switch(requestCode)
 		    {
 			case SEND_SMS_REQ_CODE:
-			    return sendSMS();
+			    sendSMS();
 			    break;
 			case RECEIVE_SMS_REQ_CODE:
-			    return receiveSMS();
+			    receiveSMS();
 			    break;
 		    }
 	}
