@@ -1,7 +1,8 @@
 package ro.telenes.cordova.smsplugin;
 
+import android.Manifest;
 import android.app.Activity;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.app.ContextCompat;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -45,22 +46,22 @@ public class SmsPlugin extends CordovaPlugin {
 	private static final int RECEIVE_SMS_PERMISSIONS_REQUEST = 1;
 	
 	public void getPermissionToSendSMS() {
-		if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.SEND_SMS)
+		if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
 			!= PackageManager.PERMISSION_GRANTED) {
 		    if (shouldShowRequestPermissionRationale(
-			    android.Manifest.permission.SEND_SMS)) {
+			    Manifest.permission.SEND_SMS)) {
 		    }
-		    requestPermissions(new String[]{android.Manifest.permission.SEND_SMS},
+		    requestPermissions(new String[]{Manifest.permission.SEND_SMS},
 			    SEND_SMS_PERMISSIONS_REQUEST);
 		}
 	    }
 	public void getPermissionToReceiveSMS() {
-		if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECEIVE_SMS)
+		if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS)
 			!= PackageManager.PERMISSION_GRANTED) {
 		    if (shouldShowRequestPermissionRationale(
-			    android.Manifest.permission.RECEIVE_SMS)) {
+			    Manifest.permission.RECEIVE_SMS)) {
 		    }
-		    requestPermissions(new String[]{android.Manifest.permission.RECEIVE_SMS},
+		    requestPermissions(new String[]{Manifest.permission.RECEIVE_SMS},
 			    RECEIVE_SMS_PERMISSIONS_REQUEST);
 		}
 	    }
@@ -77,7 +78,7 @@ public class SmsPlugin extends CordovaPlugin {
 			Toast.makeText(this, "Send SMS permission granted", Toast.LENGTH_SHORT).show();
 		    } else {
 			// showRationale = false if user clicks Never Ask Again, otherwise true
-			boolean showRationale = shouldShowRequestPermissionRationale( this, android.Manifest.permission.SEND_SMS);
+			boolean showRationale = shouldShowRequestPermissionRationale( this, Manifest.permission.SEND_SMS);
 
 			if (showRationale) {
 			   // do something here to handle degraded mode
@@ -91,7 +92,7 @@ public class SmsPlugin extends CordovaPlugin {
 			Toast.makeText(this, "Receive SMS permission granted", Toast.LENGTH_SHORT).show();
 		    } else {
 			// showRationale = false if user clicks Never Ask Again, otherwise true
-			boolean showRationale = shouldShowRequestPermissionRationale( this, android.Manifest.permission.RECEIVE_SMS);
+			boolean showRationale = shouldShowRequestPermissionRationale( this, Manifest.permission.RECEIVE_SMS);
 
 			if (showRationale) {
 			   // do something here to handle degraded mode
