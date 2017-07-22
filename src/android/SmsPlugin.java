@@ -6,7 +6,7 @@ import android.support.v4.content.ContextCompat;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.wirget.Toast;
+import android.widget.Toast;
 import android.telephony.TelephonyManager;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
