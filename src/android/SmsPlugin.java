@@ -1,12 +1,9 @@
 package ro.telenes.cordova.smsplugin;
 
-import android.Manifest;
 import android.app.Activity;
-import android.support.v4.content.ContextCompat;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.widget.Toast;
 import android.telephony.TelephonyManager;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -30,81 +27,6 @@ public class SmsPlugin extends CordovaPlugin {
 
     private PluginResult pluginResult;
 	
-	@Override
-    	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-
-		// In an actual app, you'd want to request a permission when the user performs an action
-		// that requires that permission.
-		getPermissionToSendSMS();
-		getPermissionToReceiveSMS();
-    	}
-	
-	// Identifier for the permission request
-    	private static final int SEND_SMS_PERMISSIONS_REQUEST = 1;
-	private static final int RECEIVE_SMS_PERMISSIONS_REQUEST = 1;
-	
-	public void getPermissionToSendSMS() {
-		if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
-			!= PackageManager.PERMISSION_GRANTED) {
-		    if (shouldShowRequestPermissionRationale(
-			    Manifest.permission.SEND_SMS)) {
-		    }
-		    requestPermissions(new String[]{Manifest.permission.SEND_SMS},
-			    SEND_SMS_PERMISSIONS_REQUEST);
-		}
-	    }
-	public void getPermissionToReceiveSMS() {
-		if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS)
-			!= PackageManager.PERMISSION_GRANTED) {
-		    if (shouldShowRequestPermissionRationale(
-			    Manifest.permission.RECEIVE_SMS)) {
-		    }
-		    requestPermissions(new String[]{Manifest.permission.RECEIVE_SMS},
-			    RECEIVE_SMS_PERMISSIONS_REQUEST);
-		}
-	    }
-
-	    // Callback with the request from calling requestPermissions(...)
-	    @Override
-	    public void onRequestPermissionsResult(int requestCode,
-						   @NonNull String permissions[],
-						   @NonNull int[] grantResults) {
-		// Make sure it's our original READ_CONTACTS request
-		if (requestCode == SEND_SMS_PERMISSIONS_REQUEST) {
-		    if (grantResults.length == 1 &&
-			    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-			Toast.makeText(this, "Send SMS permission granted", Toast.LENGTH_SHORT).show();
-		    } else {
-			// showRationale = false if user clicks Never Ask Again, otherwise true
-			boolean showRationale = shouldShowRequestPermissionRationale( this, Manifest.permission.SEND_SMS);
-
-			if (showRationale) {
-			   // do something here to handle degraded mode
-			} else {
-			   Toast.makeText(this, "Send SMS permission denied", Toast.LENGTH_SHORT).show();
-			}
-		    }
-		} else if (requestCode == RECEIVE_SMS_PERMISSIONS_REQUEST) {
-		    if (grantResults.length == 1 &&
-			    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-			Toast.makeText(this, "Receive SMS permission granted", Toast.LENGTH_SHORT).show();
-		    } else {
-			// showRationale = false if user clicks Never Ask Again, otherwise true
-			boolean showRationale = shouldShowRequestPermissionRationale( this, Manifest.permission.RECEIVE_SMS);
-
-			if (showRationale) {
-			   // do something here to handle degraded mode
-			} else {
-			   Toast.makeText(this, "Receive SMS permission denied", Toast.LENGTH_SHORT).show();
-			}
-		    }
-		} else {
-		    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-		}
-	    }
-	
 	
 	@Override
 	public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
@@ -112,24 +34,27 @@ public class SmsPlugin extends CordovaPlugin {
 	
         switch(ActionType.valueOf(action)){
             case SEND_SMS:
-                try {
-                    String phoneNumber = args.getString(0);
-                    String message = args.getString(1);
-                    String method = args.getString(2);
-                    smsSender = new SmsSender(this.cordova.getActivity());
-                    if(method.equalsIgnoreCase("INTENT")){
-                        smsSender.invokeSMSIntent(phoneNumber, message);
-                        callbackContext.sendPluginResult(new PluginResult( PluginResult.Status.NO_RESULT));
-                    } else{
-                        smsSender.sendSMS(phoneNumber, message);
-                    }
+		if (!hasPermission()) {
+			requestPermisson();
+		}
+		try {
+		    String phoneNumber = args.getString(0);
+		    String message = args.getString(1);
+		    String method = args.getString(2);
+		    smsSender = new SmsSender(this.cordova.getActivity());
+		    if(method.equalsIgnoreCase("INTENT")){
+			smsSender.invokeSMSIntent(phoneNumber, message);
+			callbackContext.sendPluginResult(new PluginResult( PluginResult.Status.NO_RESULT));
+		    } else{
+			smsSender.sendSMS(phoneNumber, message);
+		    }
 
-                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
-                    result = true;
-                }
-                catch (JSONException ex) {
-                    callbackContext.sendPluginResult(new PluginResult( PluginResult.Status.JSON_EXCEPTION));
-                }
+		    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
+		    result = true;
+		}
+		catch (JSONException ex) {
+		    callbackContext.sendPluginResult(new PluginResult( PluginResult.Status.JSON_EXCEPTION));
+		}
                 break;
             case HAS_SMS_POSSIBILITY:
                 Activity ctx = this.cordova.getActivity();
@@ -227,4 +152,22 @@ public class SmsPlugin extends CordovaPlugin {
         }
         return result;
 	}
+	
+	private boolean hasPermission() {
+		return this.cordova.hasPermission(android.Manifest.permission.SEND_SMS);
+	}
+	
+	private void requestPermission() {
+		this.cordova.requestPermission(this, SEND_SMS_REQ_CODE, android.Manifest.permission.SEND_SMS);
+	}
+
+	public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
+		for (int r : grantResults) {
+			if (r == PackageManager.PERMISSION_DENIED) {
+				callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "User has denied permission"));
+				return;
+			}
+		}
+	}
+	
 }
