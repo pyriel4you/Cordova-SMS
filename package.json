@@ -1,0 +1,34 @@
+{
+  "name": "cordova-sms-plugin",
+  "version": "0.1.11",
+  "description": "Cross-platform plugin for Cordova / PhoneGap to to easily send SMS. Available for Android.",
+  "cordova": {
+    "id": "Cordova-SMS",
+    "platforms": [
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pyriel4you/Cordova-SMS.git"
+  },
+  "keywords": [
+    "cordova",
+    "phonegap",
+    "sms",
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=3.0.0"
+    }
+  ],
+  "author": "Adrian Ene",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pyriel4you/Cordova-SMS/issues"
+  },
+  "homepage": "https://github.com/pyriel4you/Cordova-SMS#readme"
+}
