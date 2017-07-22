@@ -24,7 +24,7 @@ smsplugin.startReception = function(successCallback,failureCallback) {
 	return exec(successCallback, failureCallback, 'SmsPlugin', 'RECEIVE_SMS', []);
 };
 	//Stop receiving sms
-smsplugin.stopReception:function(successCallback,failureCallback) {
+smsplugin.stopReception = function(successCallback,failureCallback) {
 	return exec(successCallback, failureCallback, 'SmsPlugin', 'STOP_RECEIVE_SMS', []);
 };
 
