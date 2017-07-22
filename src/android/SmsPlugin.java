@@ -26,7 +26,7 @@ public class SmsPlugin extends CordovaPlugin {
     private boolean isReceiving = false;
     private boolean result=false;
     private static final int SEND_SMS_REQ_CODE = 0;
-    private static final int RECEIVE_SMS_REQ_CODE = 0;
+    private static final int RECEIVE_SMS_REQ_CODE = 1;
     private PluginResult pluginResult;
     private JSONArray args;
 	
@@ -141,8 +141,7 @@ public class SmsPlugin extends CordovaPlugin {
 				return;
 			}
 		}
-		switch(requestCode)
-		    {
+		switch(requestCode) {
 			case SEND_SMS_REQ_CODE:
 			    sendSMS();
 			    break;
