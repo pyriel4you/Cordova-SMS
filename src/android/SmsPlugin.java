@@ -36,7 +36,8 @@ public class SmsPlugin extends CordovaPlugin {
         switch(ActionType.valueOf(action)){
             case SEND_SMS:
 		if (!hasPermission()) {
-			requestPermission();
+			Process p = requestPermission();
+			p.waitFor();
 		}
 		try {
 		    String phoneNumber = args.getString(0);
