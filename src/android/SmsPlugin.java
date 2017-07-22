@@ -26,11 +26,87 @@ public class SmsPlugin extends CordovaPlugin {
     private boolean result=false;
 
     private PluginResult pluginResult;
+	
+	@Override
+    	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
 
+		// In an actual app, you'd want to request a permission when the user performs an action
+		// that requires that permission.
+		getPermissionToSendSMS();
+		getPermissionToReceiveSMS();
+    	}
+	
+	// Identifier for the permission request
+    	private static final int SEND_SMS_PERMISSIONS_REQUEST = 1;
+	private static final int RECEIVE_SMS_PERMISSIONS_REQUEST = 1;
+	
+	public void getPermissionToSendSMS() {
+		if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
+			!= PackageManager.PERMISSION_GRANTED) {
+		    if (shouldShowRequestPermissionRationale(
+			    Manifest.permission.SEND_SMS)) {
+		    }
+		    requestPermissions(new String[]{Manifest.permission.SEND_SMS},
+			    SEND_SMS_PERMISSIONS_REQUEST);
+		}
+	    }
+	public void getPermissionToReceiveSMS() {
+		if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS)
+			!= PackageManager.PERMISSION_GRANTED) {
+		    if (shouldShowRequestPermissionRationale(
+			    Manifest.permission.RECEIVE_SMS)) {
+		    }
+		    requestPermissions(new String[]{Manifest.permission.RECEIVE_SMS},
+			    RECEIVE_SMS_PERMISSIONS_REQUEST);
+		}
+	    }
+
+	    // Callback with the request from calling requestPermissions(...)
+	    @Override
+	    public void onRequestPermissionsResult(int requestCode,
+						   @NonNull String permissions[],
+						   @NonNull int[] grantResults) {
+		// Make sure it's our original READ_CONTACTS request
+		if (requestCode == SEND_SMS_PERMISSIONS_REQUEST) {
+		    if (grantResults.length == 1 &&
+			    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+			Toast.makeText(this, "Send SMS permission granted", Toast.LENGTH_SHORT).show();
+		    } else {
+			// showRationale = false if user clicks Never Ask Again, otherwise true
+			boolean showRationale = shouldShowRequestPermissionRationale( this, Manifest.permission.SEND_SMS);
+
+			if (showRationale) {
+			   // do something here to handle degraded mode
+			} else {
+			   Toast.makeText(this, "Send SMS permission denied", Toast.LENGTH_SHORT).show();
+			}
+		    }
+		} else if (requestCode == RECEIVE_SMS_PERMISSIONS_REQUEST) {
+		    if (grantResults.length == 1 &&
+			    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+			Toast.makeText(this, "Receive SMS permission granted", Toast.LENGTH_SHORT).show();
+		    } else {
+			// showRationale = false if user clicks Never Ask Again, otherwise true
+			boolean showRationale = shouldShowRequestPermissionRationale( this, Manifest.permission.RECEIVE_SMS);
+
+			if (showRationale) {
+			   // do something here to handle degraded mode
+			} else {
+			   Toast.makeText(this, "Receive SMS permission denied", Toast.LENGTH_SHORT).show();
+			}
+		    }
+		} else {
+		    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		}
+	    }
+	
+	
 	@Override
 	public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
         action=action.toUpperCase();
-
+	
         switch(ActionType.valueOf(action)){
             case SEND_SMS:
                 try {
