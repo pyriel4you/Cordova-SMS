@@ -31,7 +31,9 @@ public class SmsPlugin extends CordovaPlugin {
 	@Override
 	public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
         action=action.toUpperCase();
-	
+	this.callbackContext = callbackContext;
+	this.args = args;
+		
         switch(ActionType.valueOf(action)){
             case SEND_SMS:
 		if (!hasPermission()) {
