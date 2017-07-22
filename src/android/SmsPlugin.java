@@ -2,7 +2,7 @@ package ro.telenes.cordova.smsplugin;
 
 import android.Manifest;
 import android.app.Activity;
-import android.support.v4.app.ContextCompat;
+import android.support.v4.content.ContextCompat;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
