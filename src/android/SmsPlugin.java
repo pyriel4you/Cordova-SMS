@@ -166,7 +166,7 @@ public class SmsPlugin extends CordovaPlugin {
 	public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
 		for (int r : grantResults) {
 			if (r == PackageManager.PERMISSION_DENIED) {
-				callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "User has denied permission"));
+				CallbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "User has denied permission"));
 				return;
 			}
 		}
