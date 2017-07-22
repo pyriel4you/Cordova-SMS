@@ -17,7 +17,7 @@ public class SmsPlugin extends CordovaPlugin {
     }
     private SmsSender smsSender;
     private SmsReceiver smsReceiver;
-
+    private CallbackContext callback_send;
     private CallbackContext callback_receive;
     private CallbackContext callback_permission;
 
@@ -26,36 +26,22 @@ public class SmsPlugin extends CordovaPlugin {
     private boolean isReceiving = false;
     private boolean result=false;
     private static final int SEND_SMS_REQ_CODE = 0;
+    private static final int RECEIVE_SMS_REQ_CODE = 0;
     private PluginResult pluginResult;
 	
 	
 	@Override
 	public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
         action=action.toUpperCase();
+	this.callbackContext = callbackContext;
+	this.args = args;
 		
         switch(ActionType.valueOf(action)){
             case SEND_SMS:
-		if (!hasPermission()) {
-			Process p = requestPermission();
-			p.waitFor();
-		}
-		try {
-		    String phoneNumber = args.getString(0);
-		    String message = args.getString(1);
-		    String method = args.getString(2);
-		    smsSender = new SmsSender(this.cordova.getActivity());
-		    if(method.equalsIgnoreCase("INTENT")){
-			smsSender.invokeSMSIntent(phoneNumber, message);
-			callbackContext.sendPluginResult(new PluginResult( PluginResult.Status.NO_RESULT));
-		    } else{
-			smsSender.sendSMS(phoneNumber, message);
-		    }
-
-		    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
-		    result = true;
-		}
-		catch (JSONException ex) {
-		    callbackContext.sendPluginResult(new PluginResult( PluginResult.Status.JSON_EXCEPTION));
+		if (!hasSendPermission()) {
+			result = requestSendPermission();
+		} else {
+			result = sendSMS();	
 		}
                 break;
             case HAS_SMS_POSSIBILITY:
@@ -98,35 +84,11 @@ public class SmsPlugin extends CordovaPlugin {
                     result = true;
                 break;
             case RECEIVE_SMS:
-                // if already receiving (this case can happen if the startReception is called
-                // several times
-                if(this.isReceiving) {
-                    // close the already opened callback ...
-                    pluginResult = new PluginResult(PluginResult.Status.NO_RESULT);
-                    pluginResult.setKeepCallback(false);
-                    this.callback_receive.sendPluginResult(pluginResult);
-
-                    // ... before registering a new one to the sms receiver
-                }
-                this.isReceiving = true;
-
-                if(this.smsReceiver == null) {
-                    this.smsReceiver = new SmsReceiver();
-                    IntentFilter fp = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
-                    fp.setPriority(1000);
-                    // fp.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
-                    this.cordova.getActivity().registerReceiver(this.smsReceiver, fp);
-                }
-
-                this.smsReceiver.startReceiving(callbackContext);
-
-                pluginResult = new PluginResult(
-                        PluginResult.Status.NO_RESULT);
-                pluginResult.setKeepCallback(true);
-                callbackContext.sendPluginResult(pluginResult);
-                this.callback_receive = callbackContext;
-
-                result=true;
+                if (!hasReceivePermission()) {
+			result = requestReceivePermission();
+		} else {
+			result = receiveSMS();	
+		}
                 break;
             case STOP_RECEIVE_SMS:
 
@@ -155,12 +117,20 @@ public class SmsPlugin extends CordovaPlugin {
         return result;
 	}
 	
-	private boolean hasPermission() {
+	private boolean hasSendPermission() {
 		return this.cordova.hasPermission(android.Manifest.permission.SEND_SMS);
 	}
 	
-	private void requestPermission() {
+	private boolean hasReceivePermission() {
+		return this.cordova.hasPermission(android.Manifest.permission.RECEIVE_SMS);
+	}
+	
+	private void requestSendPermission() {
 		this.cordova.requestPermission(this, SEND_SMS_REQ_CODE, android.Manifest.permission.SEND_SMS);
+	}
+	
+	private void requestReceivePermission() {
+		this.cordova.requestPermission(this, RECEIVE_SMS_REQ_CODE, android.Manifest.permission.RECEIVE_SMS);
 	}
 
 	public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
@@ -170,6 +140,66 @@ public class SmsPlugin extends CordovaPlugin {
 				return;
 			}
 		}
+		switch(requestCode)
+		    {
+			case SEND_SMS_REQ_CODE:
+			    return sendSMS();
+			    break;
+			case RECEIVE_SMS_REQ_CODE:
+			    return receiveSMS();
+			    break;
+		    }
+	}
+	private boolean sendSMS(){
+		try {
+		    String phoneNumber = this.args.getString(0);
+		    String message = this.args.getString(1);
+		    String method = this.args.getString(2);
+		    smsSender = new SmsSender(this.cordova.getActivity());
+		    if(method.equalsIgnoreCase("INTENT")){
+			smsSender.invokeSMSIntent(phoneNumber, message);
+			this.callback_send.sendPluginResult(new PluginResult( PluginResult.Status.NO_RESULT));
+		    } else{
+			smsSender.sendSMS(phoneNumber, message);
+		    }
+
+		    this.callback_send.sendPluginResult(new PluginResult(PluginResult.Status.OK));
+		    return true;
+		}
+		catch (JSONException ex) {
+		    this.callback_send.sendPluginResult(new PluginResult( PluginResult.Status.JSON_EXCEPTION));
+		}	
+	}
+	private boolean receiveSMS(){
+		// if already receiving (this case can happen if the startReception is called
+                // several times
+                if(this.isReceiving) {
+                    // close the already opened callback ...
+                    pluginResult = new PluginResult(PluginResult.Status.NO_RESULT);
+                    pluginResult.setKeepCallback(false);
+                    this.callback_receive.sendPluginResult(pluginResult);
+
+                    // ... before registering a new one to the sms receiver
+                }
+                this.isReceiving = true;
+
+                if(this.smsReceiver == null) {
+                    this.smsReceiver = new SmsReceiver();
+                    IntentFilter fp = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
+                    fp.setPriority(1000);
+                    // fp.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+                    this.cordova.getActivity().registerReceiver(this.smsReceiver, fp);
+                }
+
+                this.smsReceiver.startReceiving(callbackContext);
+
+                pluginResult = new PluginResult(
+                        PluginResult.Status.NO_RESULT);
+                pluginResult.setKeepCallback(true);
+                callbackContext.sendPluginResult(pluginResult);
+                this.callback_receive = callbackContext;
+
+                return true;	
 	}
 	
 }
