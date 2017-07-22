@@ -19,6 +19,7 @@ public class SmsPlugin extends CordovaPlugin {
     private SmsReceiver smsReceiver;
 
     private CallbackContext callback_receive;
+    private CallbackContext callback_permission;
 
     private TelephonyManager telephonyManager;
 
@@ -31,8 +32,6 @@ public class SmsPlugin extends CordovaPlugin {
 	@Override
 	public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
         action=action.toUpperCase();
-	this.callbackContext = callbackContext;
-	this.args = args;
 		
         switch(ActionType.valueOf(action)){
             case SEND_SMS:
@@ -166,7 +165,7 @@ public class SmsPlugin extends CordovaPlugin {
 	public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
 		for (int r : grantResults) {
 			if (r == PackageManager.PERMISSION_DENIED) {
-				CallbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "User has denied permission"));
+				this.callback_permission.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "User has denied permission"));
 				return;
 			}
 		}
