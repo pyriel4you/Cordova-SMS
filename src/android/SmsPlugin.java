@@ -192,7 +192,7 @@ public class SmsPlugin extends CordovaPlugin {
                     this.cordova.getActivity().registerReceiver(this.smsReceiver, fp);
                 }
 
-                this.smsReceiver.startReceiving(callbackContext);
+                this.smsReceiver.startReceiving(this.callback_receive);
 
                 pluginResult = new PluginResult(
                         PluginResult.Status.NO_RESULT);
